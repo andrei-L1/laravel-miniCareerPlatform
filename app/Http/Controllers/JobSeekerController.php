@@ -118,7 +118,11 @@ class JobSeekerController extends Controller
             abort(403, 'Unauthorized action.');
         }
         
-        $savedJobs = $user->savedJobs()->paginate(10);
+        $savedJobs = $user->savedJobs()
+            ->with(['employer'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+            
         return view('job_seekers.saved_jobs', compact('savedJobs'));
     }
 
@@ -135,5 +139,82 @@ class JobSeekerController extends Controller
         
         $applications = $user->applications()->with('job')->paginate(10);
         return view('job_seekers.applications', compact('applications'));
+    }
+
+    /**
+     * Display job details for job seekers.
+     */
+    public function showJob(Job $job): View
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        if (!$user->isJobSeeker()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $hasApplied = $user->applications()->where('job_id', $job->id)->exists();
+        $isSaved = $user->savedJobs()->where('job_id', $job->id)->exists();
+
+        return view('job_seekers.jobs.show', compact('job', 'hasApplied', 'isSaved'));
+    }
+
+    /**
+     * Save a job for the authenticated user.
+     */
+    public function saveJob(Job $job): RedirectResponse
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        if (!$user->isJobSeeker()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Check if job is already saved
+        if ($user->savedJobs()->where('job_id', $job->id)->exists()) {
+            return redirect()->back()->with('error', 'You have already saved this job.');
+        }
+
+        $user->savedJobs()->attach($job->id);
+        return redirect()->back()->with('success', 'Job saved successfully.');
+    }
+
+    /**
+     * Remove a job from the user's saved jobs.
+     */
+    public function unsaveJob(Job $job): RedirectResponse
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        if (!$user->isJobSeeker()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $user->savedJobs()->detach($job->id);
+        return redirect()->back()->with('success', 'Job removed from saved jobs.');
+    }
+
+    /**
+     * Apply for a job.
+     */
+    public function applyForJob(Job $job): RedirectResponse
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        if (!$user->isJobSeeker()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Check if user has already applied
+        if ($job->applications()->where('user_id', $user->id)->exists()) {
+            return redirect()->back()->with('error', 'You have already applied for this job.');
+        }
+
+        // Create new application
+        $job->applications()->create([
+            'user_id' => $user->id,
+            'status' => 'Pending'
+        ]);
+
+        return redirect()->back()->with('success', 'Application submitted successfully.');
     }
 } 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Career Resources - CareerCON</title>
+    <title>{{ $job->title }} - CareerCON</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -109,77 +109,100 @@
         <div class="welcome-banner">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <h1 class="display-6 fw-bold mb-3">Career Resources</h1>
-                    <p class="mb-0">Access tools and guides to boost your career journey.</p>
+                    <h1 class="display-6 fw-bold mb-3">{{ $job->title }}</h1>
+                    <p class="mb-0">{{ $job->employer->company_name }}</p>
                 </div>
                 <div class="d-none d-md-block">
-                    <i class="bi bi-book" style="font-size: 3rem; opacity: 0.8;"></i>
+                    <i class="bi bi-briefcase" style="font-size: 3rem; opacity: 0.8;"></i>
                 </div>
             </div>
         </div>
 
         <div class="row g-4">
-            <!-- Resume Templates -->
-            <div class="col-md-6 col-lg-3">
+            <div class="col-md-8">
                 <div class="dashboard-card p-4 bg-white">
-                    <div class="card-icon">
-                        <i class="bi bi-file-earmark-text"></i>
+                    <h3 class="h5 mb-4">Job Description</h3>
+                    <div class="mb-4">
+                        {{ $job->description }}
                     </div>
-                    <h3 class="h5">Resume Templates</h3>
-                    <ul class="list-unstyled text-muted mb-3">
-                        <li class="mb-2"><a href="#" class="text-decoration-none text-muted hover-primary">Professional Resume Template</a></li>
-                        <li class="mb-2"><a href="#" class="text-decoration-none text-muted hover-primary">Entry-Level Resume Template</a></li>
-                        <li><a href="#" class="text-decoration-none text-muted hover-primary">Internship Resume Template</a></li>
-                    </ul>
-                    <a href="#" class="btn btn-sm btn-outline-primary">View All Templates</a>
+
+                    <h3 class="h5 mb-4">Requirements</h3>
+                    <div class="mb-4">
+                        {{ $job->requirements }}
+                    </div>
+
+                    <h3 class="h5 mb-4">Skills Required</h3>
+                    <div class="mb-4">
+                        @foreach($job->skills as $skill)
+                            <span class="badge bg-primary me-2">{{ $skill->name }}</span>
+                        @endforeach
+                    </div>
                 </div>
             </div>
 
-            <!-- Interview Tips -->
-            <div class="col-md-6 col-lg-3">
+            <div class="col-md-4">
                 <div class="dashboard-card p-4 bg-white">
-                    <div class="card-icon">
-                        <i class="bi bi-chat-square-text"></i>
+                    <h3 class="h5 mb-4">Job Details</h3>
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Location</label>
+                        <p class="mb-0">
+                            <i class="bi bi-geo-alt me-2"></i>{{ $job->location }}
+                        </p>
                     </div>
-                    <h3 class="h5">Interview Tips</h3>
-                    <ul class="list-unstyled text-muted mb-3">
-                        <li class="mb-2"><a href="#" class="text-decoration-none text-muted hover-primary">Common Interview Questions</a></li>
-                        <li class="mb-2"><a href="#" class="text-decoration-none text-muted hover-primary">Interview Preparation Guide</a></li>
-                        <li><a href="#" class="text-decoration-none text-muted hover-primary">Virtual Interview Tips</a></li>
-                    </ul>
-                    <a href="#" class="btn btn-sm btn-outline-primary">View All Tips</a>
-                </div>
-            </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Salary</label>
+                        <p class="mb-0">
+                            <i class="bi bi-currency-dollar me-2"></i>{{ $job->salary }}
+                        </p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Job Type</label>
+                        <p class="mb-0">
+                            <i class="bi bi-briefcase me-2"></i>{{ ucfirst($job->type) }}
+                        </p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Posted On</label>
+                        <p class="mb-0">
+                            <i class="bi bi-calendar me-2"></i>{{ $job->created_at->format('M d, Y') }}
+                        </p>
+                    </div>
 
-            <!-- Career Development -->
-            <div class="col-md-6 col-lg-3">
-                <div class="dashboard-card p-4 bg-white">
-                    <div class="card-icon">
-                        <i class="bi bi-graph-up-arrow"></i>
-                    </div>
-                    <h3 class="h5">Career Development</h3>
-                    <ul class="list-unstyled text-muted mb-3">
-                        <li class="mb-2"><a href="#" class="text-decoration-none text-muted hover-primary">Career Planning Guide</a></li>
-                        <li class="mb-2"><a href="#" class="text-decoration-none text-muted hover-primary">Skill Development Resources</a></li>
-                        <li><a href="#" class="text-decoration-none text-muted hover-primary">Industry Insights</a></li>
-                    </ul>
-                    <a href="#" class="btn btn-sm btn-outline-primary">View All Resources</a>
-                </div>
-            </div>
+                    <div class="d-grid gap-2 mt-4">
+                        @if(!$hasApplied)
+                            <form action="{{ route('job_seeker.jobs.apply', $job) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-send me-2"></i>Apply Now
+                                </button>
+                            </form>
+                        @else
+                            <button class="btn btn-secondary w-100" disabled>
+                                <i class="bi bi-check-circle me-2"></i>Already Applied
+                            </button>
+                        @endif
 
-            <!-- Networking -->
-            <div class="col-md-6 col-lg-3">
-                <div class="dashboard-card p-4 bg-white">
-                    <div class="card-icon">
-                        <i class="bi bi-people"></i>
+                        @if(!$isSaved)
+                            <form action="{{ route('job_seeker.jobs.save', $job) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="btn btn-outline-primary w-100">
+                                    <i class="bi bi-bookmark me-2"></i>Save Job
+                                </button>
+                            </form>
+                        @else
+                            <form action="{{ route('job_seeker.jobs.unsave', $job) }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-outline-danger w-100">
+                                    <i class="bi bi-bookmark-x me-2"></i>Remove from Saved
+                                </button>
+                            </form>
+                        @endif
+
+                        <a href="{{ route('job_seeker.opportunities') }}" class="btn btn-outline-secondary w-100">
+                            <i class="bi bi-arrow-left me-2"></i>Back to Opportunities
+                        </a>
                     </div>
-                    <h3 class="h5">Networking</h3>
-                    <ul class="list-unstyled text-muted mb-3">
-                        <li class="mb-2"><a href="#" class="text-decoration-none text-muted hover-primary">Professional Networking Tips</a></li>
-                        <li class="mb-2"><a href="#" class="text-decoration-none text-muted hover-primary">LinkedIn Profile Guide</a></li>
-                        <li><a href="#" class="text-decoration-none text-muted hover-primary">Industry Events Calendar</a></li>
-                    </ul>
-                    <a href="#" class="btn btn-sm btn-outline-primary">View All Resources</a>
                 </div>
             </div>
         </div>

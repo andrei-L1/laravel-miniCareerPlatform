@@ -31,9 +31,8 @@ class Job extends Model
         ]);
     }
 
-    public function skills()
+    public function applications()
     {
-        return $this->belongsToMany(Skill::class, 'job_skills')
-            ->withTimestamps();
+        return $this->hasMany(Application::class);
     }
 }

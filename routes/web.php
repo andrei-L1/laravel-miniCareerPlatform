@@ -34,6 +34,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/profile', [JobSeekerController::class, 'index'])->name('profile');
         Route::get('/profile/edit', [JobSeekerController::class, 'edit'])->name('profile.edit');
         Route::put('/profile', [JobSeekerController::class, 'update'])->name('profile.update');
+        
+        // New routes for job actions
+        Route::post('/jobs/{job}/save', [JobSeekerController::class, 'saveJob'])->name('jobs.save');
+        Route::delete('/jobs/{job}/unsave', [JobSeekerController::class, 'unsaveJob'])->name('jobs.unsave');
+        Route::post('/jobs/{job}/apply', [JobSeekerController::class, 'applyForJob'])->name('jobs.apply');
+        Route::get('/jobs/{job}', [JobSeekerController::class, 'showJob'])->name('jobs.show');
     });
        
 });
@@ -55,6 +61,10 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 // Employer Routes
 Route::middleware(['auth'])->prefix('employer')->name('employer.')->group(function () {
     Route::resource('jobs', EmployerController::class);
+    Route::get('/jobs/{job}/applications', [EmployerController::class, 'applications'])->name('jobs.applications');
+    Route::get('/applications/{application}', [EmployerController::class, 'showApplication'])->name('applications.show');
+    Route::put('/applications/{application}', [EmployerController::class, 'updateApplication'])->name('applications.update');
+    Route::get('/candidates', [EmployerController::class, 'searchCandidates'])->name('candidates.search');
 });
 
 

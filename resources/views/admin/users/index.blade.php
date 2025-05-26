@@ -5,192 +5,282 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>User Management - CareerCON</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4cc9f0;
+            --light-bg: #f8f9fa;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            --card-hover-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+        
+        .dashboard-card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--card-hover-shadow);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .welcome-banner {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
-    <nav class="bg-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <a href="{{ route('dashboard') }}" class="text-xl font-bold">CareerCON</a>
-                </div>
-                <div class="flex items-center">
-                    <span class="mr-4">Welcome, {{ auth()->user()->full_name }}</span>
-                    <form action="{{ route('auth.destroy') }}" method="POST">
-                        @csrf
-                        <button type="submit" class="text-red-500 hover:text-red-700">Logout</button>
-                    </form>
-                </div>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ route('dashboard') }}">CareerCON</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle me-1"></i> {{ auth()->user()->full_name }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form action="{{ route('auth.destroy') }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        <i class="bi bi-box-arrow-right me-2"></i>Logout
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
             </div>
         </div>
     </nav>
 
-    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div class="px-4 py-6 sm:px-0">
-            <div class="bg-white shadow rounded-lg p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h1 class="text-2xl font-bold">User Management</h1>
-                    <a href="{{ route('dashboard') }}" class="text-blue-500 hover:text-blue-700">← Back to Dashboard</a>
+    <main class="container py-4">
+        <div class="welcome-banner">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="display-6 fw-bold mb-3">User Management</h1>
+                    <p class="mb-0">Manage and monitor all platform users</p>
                 </div>
-                
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Additional Info</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            @foreach($users as $user)
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap">{{ $user->full_name }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">{{ $user->email }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">{{ ucfirst($user->user_type) }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    @if($user->user_type === 'student')
-                                        ID: {{ $user->student_id }} | Grad: {{ $user->graduation_year }}
-                                    @elseif($user->user_type === 'employer')
-                                        Company: {{ $user->company_name }}
-                                    @elseif($user->user_type === 'professional')
-                                        Job: {{ $user->current_job }}
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <button 
-                                        class="edit-user-btn text-blue-500 hover:text-blue-700 mr-2"
-                                        data-id="{{ $user->id }}"
-                                        data-first-name="{{ $user->first_name }}"
-                                        data-last-name="{{ $user->last_name }}"
-                                        data-email="{{ $user->email }}"
-                                        data-type="{{ $user->user_type }}"
-                                        data-student-id="{{ $user->student_id }}"
-                                        data-graduation-year="{{ $user->graduation_year }}"
-                                        data-company-name="{{ $user->company_name }}"
-                                        data-current-job="{{ $user->current_job }}"
-                                    >
-                                        Edit
-                                    </button>
-                                    <button 
-                                        class="delete-user-btn text-red-500 hover:text-red-700"
-                                        data-id="{{ $user->id }}"
-                                    >
-                                        Delete
-                                    </button>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="mt-4">
-                    {{ $users->links() }}
+                <div class="d-none d-md-block">
+                    <i class="bi bi-people-fill" style="font-size: 3rem; opacity: 0.8;"></i>
                 </div>
             </div>
         </div>
-    </div>
+
+        <div class="dashboard-card p-4 bg-white">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="h5 mb-0">All Users</h2>
+                <a href="{{ route('dashboard') }}" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-arrow-left me-1"></i>Back to Dashboard
+                </a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Type</th>
+                            <th>Additional Info</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($users as $user)
+                        <tr>
+                            <td>{{ $user->full_name }}</td>
+                            <td>{{ $user->email }}</td>
+                            <td><span class="badge bg-primary">{{ ucfirst($user->user_type) }}</span></td>
+                            <td>
+                                @if($user->user_type === 'student')
+                                    <small class="text-muted">ID: {{ $user->student_id }} | Grad: {{ $user->graduation_year }}</small>
+                                @elseif($user->user_type === 'employer')
+                                    <small class="text-muted">Company: {{ $user->company_name }}</small>
+                                @elseif($user->user_type === 'professional')
+                                    <small class="text-muted">Job: {{ $user->current_job }}</small>
+                                @endif
+                            </td>
+                            <td>
+                                <button 
+                                    class="btn btn-sm btn-outline-primary edit-user-btn me-2"
+                                    data-id="{{ $user->id }}"
+                                    data-first-name="{{ $user->first_name }}"
+                                    data-last-name="{{ $user->last_name }}"
+                                    data-email="{{ $user->email }}"
+                                    data-type="{{ $user->user_type }}"
+                                    data-student-id="{{ $user->student_id }}"
+                                    data-graduation-year="{{ $user->graduation_year }}"
+                                    data-company-name="{{ $user->company_name }}"
+                                    data-current-job="{{ $user->current_job }}"
+                                >
+                                    <i class="bi bi-pencil me-1"></i>Edit
+                                </button>
+                                <button 
+                                    class="btn btn-sm btn-outline-danger delete-user-btn"
+                                    data-id="{{ $user->id }}"
+                                >
+                                    <i class="bi bi-trash me-1"></i>Delete
+                                </button>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-4">
+                {{ $users->links() }}
+            </div>
+        </div>
+    </main>
 
     <!-- Edit User Modal -->
-    <div id="editModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div class="mt-3">
-                <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Edit User</h3>
-                <form id="editUserForm" method="POST">
-                    @csrf
-                    @method('PUT')
-                    <input type="hidden" id="userId" name="user_id">
-                    
-                    <div class="mb-4">
-                        <label for="first_name" class="block text-sm font-medium text-gray-700">First Name</label>
-                        <input type="text" id="first_name" name="first_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="last_name" class="block text-sm font-medium text-gray-700">Last Name</label>
-                        <input type="text" id="last_name" name="last_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                        <input type="email" id="email" name="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="user_type" class="block text-sm font-medium text-gray-700">User Type</label>
-                        <select id="user_type" name="user_type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" onchange="toggleTypeFields()">
-                            <option value="student">Student</option>
-                            <option value="professional">Professional</option>
-                            <option value="employer">Employer</option>
-                            <option value="admin">Admin</option>
-                        </select>
-                    </div>
-
-                    <!-- Student Fields -->
-                    <div id="studentFields" class="hidden">
-                        <div class="mb-4">
-                            <label for="student_id" class="block text-sm font-medium text-gray-700">Student ID</label>
-                            <input type="text" id="student_id" name="student_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+    <div class="modal fade" id="editModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editUserForm" method="POST">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" id="userId" name="user_id">
+                        
+                        <div class="mb-3">
+                            <label for="first_name" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="first_name" name="first_name">
                         </div>
-                        <div class="mb-4">
-                            <label for="graduation_year" class="block text-sm font-medium text-gray-700">Graduation Year</label>
-                            <input type="number" id="graduation_year" name="graduation_year" min="2000" max="2100" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        </div>
-                    </div>
 
-                    <!-- Employer Fields -->
-                    <div id="employerFields" class="hidden">
-                        <div class="mb-4">
-                            <label for="company_name" class="block text-sm font-medium text-gray-700">Company Name</label>
-                            <input type="text" id="company_name" name="company_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <div class="mb-3">
+                            <label for="last_name" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="last_name" name="last_name">
                         </div>
-                    </div>
 
-                    <!-- Professional Fields -->
-                    <div id="professionalFields" class="hidden">
-                        <div class="mb-4">
-                            <label for="current_job" class="block text-sm font-medium text-gray-700">Current Job</label>
-                            <input type="text" id="current_job" name="current_job" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email">
                         </div>
-                    </div>
 
-                    <div class="mt-4 flex justify-end space-x-3">
-                        <button type="button" onclick="closeModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Cancel</button>
-                        <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Save Changes</button>
-                    </div>
-                </form>
+                        <div class="mb-3">
+                            <label for="user_type" class="form-label">User Type</label>
+                            <select class="form-select" id="user_type" name="user_type" onchange="toggleTypeFields()">
+                                <option value="student">Student</option>
+                                <option value="professional">Professional</option>
+                                <option value="employer">Employer</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+
+                        <!-- Student Fields -->
+                        <div id="studentFields" class="d-none">
+                            <div class="mb-3">
+                                <label for="student_id" class="form-label">Student ID</label>
+                                <input type="text" class="form-control" id="student_id" name="student_id">
+                            </div>
+                            <div class="mb-3">
+                                <label for="graduation_year" class="form-label">Graduation Year</label>
+                                <input type="number" class="form-control" id="graduation_year" name="graduation_year" min="2000" max="2100">
+                            </div>
+                        </div>
+
+                        <!-- Employer Fields -->
+                        <div id="employerFields" class="d-none">
+                            <div class="mb-3">
+                                <label for="company_name" class="form-label">Company Name</label>
+                                <input type="text" class="form-control" id="company_name" name="company_name">
+                            </div>
+                        </div>
+
+                        <!-- Professional Fields -->
+                        <div id="professionalFields" class="d-none">
+                            <div class="mb-3">
+                                <label for="current_job" class="form-label">Current Job</label>
+                                <input type="text" class="form-control" id="current_job" name="current_job">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" form="editUserForm" class="btn btn-primary">Save Changes</button>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function toggleTypeFields() {
             const userType = document.getElementById('user_type').value;
             
             // Hide all type-specific fields
-            document.getElementById('studentFields').classList.add('hidden');
-            document.getElementById('employerFields').classList.add('hidden');
-            document.getElementById('professionalFields').classList.add('hidden');
+            document.getElementById('studentFields').classList.add('d-none');
+            document.getElementById('employerFields').classList.add('d-none');
+            document.getElementById('professionalFields').classList.add('d-none');
             
             // Show relevant fields based on user type
             if (userType === 'student') {
-                document.getElementById('studentFields').classList.remove('hidden');
+                document.getElementById('studentFields').classList.remove('d-none');
             } else if (userType === 'employer') {
-                document.getElementById('employerFields').classList.remove('hidden');
+                document.getElementById('employerFields').classList.remove('d-none');
             } else if (userType === 'professional') {
-                document.getElementById('professionalFields').classList.remove('hidden');
+                document.getElementById('professionalFields').classList.remove('d-none');
             }
         }
 
-        function closeModal() {
-            document.getElementById('editModal').classList.add('hidden');
-        }
-
         document.addEventListener('DOMContentLoaded', function() {
+            const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+
             // Add click event listeners to all edit buttons
             document.querySelectorAll('.edit-user-btn').forEach(button => {
                 button.addEventListener('click', function() {
@@ -216,7 +306,7 @@
                     document.getElementById('editUserForm').action = `/admin/users/${id}`;
                     
                     toggleTypeFields();
-                    document.getElementById('editModal').classList.remove('hidden');
+                    editModal.show();
                 });
             });
 
@@ -268,7 +358,6 @@
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
-                                // Remove the row from the table
                                 this.closest('tr').remove();
                                 alert('User deleted successfully');
                             } else {

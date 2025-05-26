@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Job Postings - CareerCON</title>
+    <title>Application Details - CareerCON</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -16,7 +16,6 @@
             --accent-color: #4cc9f0;
             --light-bg: #f8f9fa;
             --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            --card-hover-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
         }
         
         body {
@@ -35,12 +34,6 @@
             border-radius: 10px;
             box-shadow: var(--card-shadow);
             transition: all 0.3s ease;
-            height: 100%;
-        }
-        
-        .dashboard-card:hover {
-            box-shadow: var(--card-hover-shadow);
-            transform: translateY(-2px);
         }
         
         .welcome-banner {
@@ -51,45 +44,23 @@
             margin-bottom: 2rem;
         }
         
-        .btn-primary {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-        
-        .btn-outline-primary {
-            color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-        
-        .btn-outline-primary:hover {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .job-card {
-            border: none;
-            border-radius: 10px;
-            box-shadow: var(--card-shadow);
-            transition: all 0.3s ease;
-        }
-
-        .job-card:hover {
-            box-shadow: var(--card-hover-shadow);
-            transform: translateY(-2px);
-        }
-
         .status-badge {
             font-size: 0.875rem;
             padding: 0.35em 0.65em;
             border-radius: 50rem;
         }
 
-        .status-active {
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-accepted {
             background-color: #d1e7dd;
             color: #0f5132;
         }
 
-        .status-closed {
+        .status-rejected {
             background-color: #f8d7da;
             color: #842029;
         }
@@ -128,73 +99,86 @@
     </nav>
 
     <main class="container py-4">
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
         <div class="welcome-banner">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <h1 class="display-6 fw-bold mb-3">My Job Postings</h1>
-                    <p class="mb-0">Manage your job listings and track applications.</p>
+                    <h1 class="display-6 fw-bold mb-3">Application Details</h1>
+                    <p class="mb-0">Review application for {{ $application->job->title }}</p>
                 </div>
                 <div class="d-none d-md-block">
-                    <i class="bi bi-briefcase" style="font-size: 3rem; opacity: 0.8;"></i>
+                    <i class="bi bi-file-earmark-text" style="font-size: 3rem; opacity: 0.8;"></i>
                 </div>
             </div>
         </div>
 
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="h4 mb-0">Active Job Postings</h2>
-            <div class="d-flex gap-2">
-                <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left me-1"></i>Back to Dashboard
-                </a>
-                <a href="{{ route('employer.jobs.create') }}" class="btn btn-primary">
-                    <i class="bi bi-plus-circle me-1"></i>Post New Job
-                </a>
-            </div>
+            <h2 class="h4 mb-0">Applicant Information</h2>
+            <a href="{{ route('employer.jobs.applications', $application->job) }}" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left me-1"></i>Back to Applications
+            </a>
         </div>
 
-        @if($jobs->isEmpty())
-            <div class="dashboard-card p-5 bg-white text-center">
-                <i class="bi bi-briefcase mb-3" style="font-size: 3rem; color: var(--primary-color);"></i>
-                <h3 class="h5 mb-3">No Job Postings Yet</h3>
-                <p class="text-muted mb-4">Start by creating your first job posting to attract potential candidates.</p>
-                <a href="{{ route('employer.jobs.create') }}" class="btn btn-primary">
-                    <i class="bi bi-plus-circle me-1"></i>Create Job Posting
-                </a>
-            </div>
-        @else
-            <div class="row g-4">
-                @foreach($jobs as $job)
-                    <div class="col-md-6 col-lg-4">
-                        <div class="job-card p-4 bg-white h-100">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <h3 class="h5 mb-0">{{ $job->title }}</h3>
-                                <span class="status-badge {{ $job->status === 'active' ? 'status-active' : 'status-closed' }}">
-                                    {{ ucfirst($job->status) }}
-                                </span>
-                            </div>
-                            <p class="text-muted mb-3">
-                                <i class="bi bi-geo-alt me-1"></i>{{ $job->location }}
-                            </p>
-                            <div class="d-flex gap-2">
-                                <a href="{{ route('employer.jobs.edit', $job->id) }}" class="btn btn-outline-primary btn-sm">
-                                    <i class="bi bi-pencil me-1"></i>Edit
-                                </a>
-                                <a href="{{ route('employer.jobs.applications', $job->id) }}" class="btn btn-outline-secondary btn-sm">
-                                    <i class="bi bi-people me-1"></i>View Applications
-                                </a>
-                            </div>
-                        </div>
+        <div class="row g-4">
+            <div class="col-md-8">
+                <div class="dashboard-card p-4 bg-white">
+                    <h3 class="h5 mb-4">Applicant Details</h3>
+                    <div class="mb-4">
+                        <h4 class="h6 text-muted mb-2">Full Name</h4>
+                        <p class="mb-0">{{ $application->user->full_name }}</p>
                     </div>
-                @endforeach
+                    <div class="mb-4">
+                        <h4 class="h6 text-muted mb-2">Email</h4>
+                        <p class="mb-0">{{ $application->user->email }}</p>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="h6 text-muted mb-2">Applied Date</h4>
+                        <p class="mb-0">{{ $application->created_at->format('F d, Y') }}</p>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="h6 text-muted mb-2">Status</h4>
+                        <span class="status-badge status-{{ strtolower($application->status) }}">
+                            {{ $application->status }}
+                        </span>
+                    </div>
+                </div>
             </div>
 
-            <div class="mt-4">
-                {{ $jobs->links() }}
+            <div class="col-md-4">
+                <div class="dashboard-card p-4 bg-white">
+                    <h3 class="h5 mb-4">Actions</h3>
+                    @if($application->status === 'Pending')
+                        <form action="{{ route('employer.applications.update', $application) }}" method="POST" class="mb-3">
+                            @csrf
+                            @method('PUT')
+                            <input type="hidden" name="status" value="Accepted">
+                            <button type="submit" class="btn btn-success w-100">
+                                <i class="bi bi-check-circle me-1"></i>Accept Application
+                            </button>
+                        </form>
+                        <form action="{{ route('employer.applications.update', $application) }}" method="POST">
+                            @csrf
+                            @method('PUT')
+                            <input type="hidden" name="status" value="Rejected">
+                            <button type="submit" class="btn btn-danger w-100">
+                                <i class="bi bi-x-circle me-1"></i>Reject Application
+                            </button>
+                        </form>
+                    @else
+                        <p class="text-muted mb-0">This application has already been {{ strtolower($application->status) }}.</p>
+                    @endif
+                </div>
             </div>
-        @endif
+        </div>
     </main>
 
     <!-- Bootstrap 5 JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-</html>
+</html> 

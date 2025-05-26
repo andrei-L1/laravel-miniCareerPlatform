@@ -35,4 +35,12 @@ class Application extends Model
     {
         return $this->belongsTo(Job::class);
     }
+
+    /**
+     * Get the job seeker who submitted the application.
+     */
+    public function jobSeeker(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 } 

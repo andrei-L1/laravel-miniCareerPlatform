@@ -1,51 +1,190 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saved Jobs - CareerCON</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4cc9f0;
+            --light-bg: #f8f9fa;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            --card-hover-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+        
+        .dashboard-card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--card-hover-shadow);
+        }
+        
+        .card-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        
+        .welcome-banner {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">CareerCON</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle me-1"></i> {{ auth()->user()->full_name }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form action="{{ route('auth.destroy') }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        <i class="bi bi-box-arrow-right me-2"></i>Logout
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-@section('content')
-<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-    <div class="px-4 py-6 sm:px-0">
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-bold">Saved Jobs</h1>
-            <a href="{{ route('dashboard') }}" class="text-blue-500 hover:text-blue-700">← Back to Dashboard</a>
+    <main class="container py-4">
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+        <div class="welcome-banner">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="display-6 fw-bold mb-3">Saved Jobs</h1>
+                    <p class="mb-0">Track and manage your bookmarked job opportunities.</p>
+                </div>
+                <div class="d-none d-md-block">
+                    <i class="bi bi-bookmark-star" style="font-size: 3rem; opacity: 0.8;"></i>
+                </div>
+            </div>
         </div>
 
         @if($savedJobs->isEmpty())
-            <div class="bg-white shadow rounded-lg p-6 text-center">
-                <p class="text-gray-500">You haven't saved any jobs yet.</p>
-                <a href="{{ route('job_seeker.opportunities') }}" class="mt-4 inline-block text-blue-500 hover:text-blue-700">Browse Available Opportunities</a>
+            <div class="dashboard-card p-4 bg-white text-center">
+                <div class="card-icon">
+                    <i class="bi bi-bookmark-x"></i>
+                </div>
+                <h3 class="h5 mb-3">No Saved Jobs</h3>
+                <p class="text-muted mb-4">You haven't saved any jobs yet.</p>
+                <a href="{{ route('job_seeker.opportunities') }}" class="btn btn-primary">Browse Available Opportunities</a>
             </div>
         @else
-            <div class="grid grid-cols-1 gap-6">
+            <div class="row g-4">
                 @foreach($savedJobs as $savedJob)
-                    <div class="bg-white shadow rounded-lg p-6">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <h2 class="text-xl font-semibold text-gray-900">{{ $savedJob->job->title }}</h2>
-                                <p class="text-gray-600">{{ $savedJob->job->employer->company_name }}</p>
-                                <div class="mt-2 flex items-center text-sm text-gray-500">
-                                    <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                    </svg>
-                                    {{ $savedJob->job->location }}
+                    <div class="col-md-6">
+                        <div class="dashboard-card p-4 bg-white">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h3 class="h5 mb-2">{{ $savedJob->title }}</h3>
+                                    <p class="text-muted mb-2">{{ $savedJob->employer->company_name ?? 'Unknown Company' }}</p>
+                                    <div class="d-flex align-items-center text-muted mb-2">
+                                        <i class="bi bi-geo-alt me-2"></i>
+                                        {{ $savedJob->location }}
+                                    </div>
+                                    <div class="d-flex align-items-center text-muted">
+                                        <i class="bi bi-currency-dollar me-2"></i>
+                                        {{ $savedJob->salary }}
+                                    </div>
                                 </div>
-                                <div class="mt-1 flex items-center text-sm text-gray-500">
-                                    <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                    {{ $savedJob->job->salary }}
-                                </div>
-                            </div>
-                            <div class="flex space-x-3">
-                                <a href="{{ route('jobs.show', $savedJob->job) }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
-                                    View Details
-                                </a>
-                                <form action="{{ route('job_seekers.saved_jobs.destroy', $savedJob) }}" method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                                        Remove
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        Actions
                                     </button>
-                                </form>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="{{ route('job_seeker.jobs.show', $savedJob) }}">View Details</a></li>
+                                        @if(!$savedJob->applications()->where('user_id', auth()->id())->exists())
+                                            <li>
+                                                <form action="{{ route('job_seeker.jobs.apply', $savedJob) }}" method="POST">
+                                                    @csrf
+                                                    <button type="submit" class="dropdown-item">Apply Now</button>
+                                                </form>
+                                            </li>
+                                        @else
+                                            <li><span class="dropdown-item text-muted">Already Applied</span></li>
+                                        @endif
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <form action="{{ route('job_seeker.jobs.unsave', $savedJob) }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="dropdown-item text-danger">Remove from Saved</button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -56,6 +195,9 @@
                 {{ $savedJobs->links() }}
             </div>
         @endif
-    </div>
-</div>
-@endsection 
+    </main>
+
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 
